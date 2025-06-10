@@ -12,11 +12,17 @@ export default function App() {
       .then(text => {
         const rows = text.split("\n").slice(1);
         const parsed = rows.map(row => {
-          const [nombre, porcentaje, imagen] = row.split(",");
+          const cols = row.split(",");
+          const nombre = cols[0]?.trim();
+          const porcentajeStr = cols[2]?.replace("%", "").replace(",", ".").trim();
+          const imagen = cols[4]?.trim();
+
+          const porcentaje = parseFloat(porcentajeStr);
+
           return {
             nombre,
-            porcentaje: parseFloat(porcentaje),
-            imagen: imagen?.trim()
+            porcentaje,
+            imagen
           };
         }).filter(e => !isNaN(e.porcentaje));
 
@@ -27,7 +33,7 @@ export default function App() {
 
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
-      <h1 style={{ fontSize: "24px", marginBottom: "20px" }}>Intención de Voto - Región Caribe (Oposición)</h1>
+      <h1 style={{ fontSize: "24px", marginBottom: "20px" }}>Progreso Mensual de los Colaboradores - Hydra 2025</h1>
       <ResponsiveContainer width="100%" height={60 * data.length}>
         <BarChart layout="vertical" data={data} margin={{ top: 10, right: 50, left: 100, bottom: 10 }}>
           <XAxis type="number" domain={[0, 20]} tickFormatter={(v) => `${v}%`} />
