@@ -10,19 +10,14 @@ export default function App() {
     fetch(SHEET_URL)
       .then(res => res.text())
       .then(text => {
-        const rows = text.split("\n").slice(1);
+        const rows = text.split("\n").slice(2); // Ignora las 2 primeras filas
         const parsed = rows.map(row => {
-          const cols = row.split(",");
-          const nombre = cols[0]?.trim();
-          const porcentajeStr = cols[2]?.replace("%", "").replace(",", ".").trim();
-          const imagen = cols[4]?.trim();
-
-          const porcentaje = parseFloat(porcentajeStr);
-
+          const [nombre, , porcentajeTexto, , imagen] = row.split(",");
+          const porcentaje = parseFloat(porcentajeTexto?.replace("%", "").replace(",", "."));
           return {
-            nombre,
+            nombre: nombre?.trim(),
             porcentaje,
-            imagen
+            imagen: imagen?.trim()
           };
         }).filter(e => !isNaN(e.porcentaje));
 
@@ -33,9 +28,16 @@ export default function App() {
 
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
-      <h1 style={{ fontSize: "24px", marginBottom: "20px" }}>Progreso Mensual de los Colaboradores - Hydra 2025</h1>
+      <h1 style={{ fontSize: "24px", marginBottom: "20px" }}>
+        Progreso Mensual de los Colaboradores - Hydra 2025
+      </h1>
+
       <ResponsiveContainer width="100%" height={60 * data.length}>
-        <BarChart layout="vertical" data={data} margin={{ top: 10, right: 50, left: 100, bottom: 10 }}>
+        <BarChart
+          layout="vertical"
+          data={data}
+          margin={{ top: 10, right: 50, left: 100, bottom: 10 }}
+        >
           <XAxis type="number" domain={[0, 20]} tickFormatter={(v) => `${v}%`} />
           <YAxis type="category" dataKey="nombre" tick={{ fontSize: 14 }} width={150} />
           <Tooltip formatter={(value) => `${value}%`} />
@@ -47,10 +49,26 @@ export default function App() {
         </BarChart>
       </ResponsiveContainer>
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", marginTop: "40px" }}>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "20px",
+          marginTop: "40px"
+        }}
+      >
         {data.map((item, index) => (
           <div key={index} style={{ textAlign: "center" }}>
-            <img src={item.imagen} alt={item.nombre} style={{ width: "80px", height: "80px", borderRadius: "50%", objectFit: "cover" }} />
+            <img
+              src={item.imagen}
+              alt={item.nombre}
+              style={{
+                width: "80px",
+                height: "80px",
+                borderRadius: "50%",
+                objectFit: "cover"
+              }}
+            />
             <p style={{ marginTop: "10px", fontWeight: "bold" }}>{item.nombre}</p>
             <p>{item.porcentaje}%</p>
           </div>
